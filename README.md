@@ -177,3 +177,9 @@ Query params on `GET /api/rfqs/`: `search=`, `ordering=`, `status=OPEN|CLOSED`.
 - File attachments on RFQs/quotations are not supported.
 - Currency is displayed as ₹ (INR) as a UI default — the underlying field is
   a plain decimal with no currency code, so this is a display choice only.
+
+
+  ## Live Links
+- **Live App:** https://rfq-marketplace-rose.vercel.app
+- **Backend API:** https://rfq-marketplace-production.up.railway.app/api
+- **GitHub Repo:** https://github.com/raju8143/rfq-marketplace.git
