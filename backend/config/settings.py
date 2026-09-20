@@ -2,10 +2,14 @@
 Django settings for the B2B RFQ Marketplace project.
 """
 import os
+import importlib
 from datetime import timedelta
 from pathlib import Path
 
-from dotenv import load_dotenv
+try:
+    load_dotenv = importlib.import_module("dotenv").load_dotenv
+except ImportError:
+    load_dotenv = lambda *args, **kwargs: None
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 load_dotenv(BASE_DIR / ".env")
@@ -158,3 +162,22 @@ CORS_ALLOWED_ORIGINS = [
 ]
 # In DEBUG, be permissive so the assignment is easy to test from any dev origin.
 CORS_ALLOW_ALL_ORIGINS = DEBUG
+
+# ---------------------------------------------------------------------------
+# CSRF / reverse proxy (Railway, Render, etc.)
+# ---------------------------------------------------------------------------
+# Platforms like Railway terminate HTTPS at their proxy and forward requests
+# to this app as plain HTTP. Without telling Django that, it won't trust the
+# request was actually secure, and Django's CSRF protection (used by the
+# server-rendered /admin/ login form) will reject POSTs with a 403 even
+# though the browser really did use HTTPS. This header tells Django to
+# trust Railway's "X-Forwarded-Proto" header for that determination.
+SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
+
+# Django 4+ also requires HTTPS origins that will POST here (e.g. the admin
+# login form on your live Railway URL) to be explicitly trusted. Set this in
+# your deployment platform's env vars, e.g.:
+#   CSRF_TRUSTED_ORIGINS=https://rfq-marketplace-production.up.railway.app
+CSRF_TRUSTED_ORIGINS = [
+    o.strip() for o in os.getenv("CSRF_TRUSTED_ORIGINS", "").split(",") if o.strip()
+]
